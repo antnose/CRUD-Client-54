@@ -1,28 +1,46 @@
+import { useEffect } from "react";
+import axios from "axios";
+import { useState } from "react";
+
 const Users = () => {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await axios.get("http://localhost:3001/users");
+      setUsers(data.data);
+    };
+    fetchData();
+  }, []);
+
   const handleUser = (e) => {
     e.preventDefault();
     const name = e.target.name.value;
     const email = e.target.email.value;
+    const newUser = { name, email };
 
     fetch(`http://localhost:3001/users`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ name, email }),
+      body: JSON.stringify(newUser),
     })
       .then((res) => res.json())
       .then((data) => {
         console.log("After saving data", data);
         if (data.insertedId) {
           alert("Users added successfully");
+          newUser._id = data.insertedId;
+          setUsers([...users, newUser]);
           e.target.reset();
+          console.log(data);
         }
       });
   };
 
   return (
-    <div className="h-screen items-center justify-center grid">
+    <div>
       <form
         onSubmit={handleUser}
         className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg space-y-6"
@@ -58,10 +76,19 @@ const Users = () => {
           Add User
         </button>
       </form>
+
+      <div className="text-center mt-10 pt-10">
+        {users.map((user) => (
+          <p
+            key={user?._id}
+            className="text-2xl font-semibold py-2 my-4 border-amber-400 border w-11/12 mx-auto"
+          >
+            {user.name} : {user?.email}
+          </p>
+        ))}
+      </div>
     </div>
   );
 };
 
 export default Users;
-
-// 54-3 Create client-side post and send data to the server side 4.57
