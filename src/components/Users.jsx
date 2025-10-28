@@ -3,11 +3,26 @@ const Users = () => {
     e.preventDefault();
     const name = e.target.name.value;
     const email = e.target.email.value;
-    console.log(name, email);
+
+    fetch(`http://localhost:3001/users`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ name, email }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("After saving data", data);
+        if (data.insertedId) {
+          alert("Users added successfully");
+          e.target.reset();
+        }
+      });
   };
 
   return (
-    <div>
+    <div className="h-screen items-center justify-center grid">
       <form
         onSubmit={handleUser}
         className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg space-y-6"
@@ -48,3 +63,5 @@ const Users = () => {
 };
 
 export default Users;
+
+// 54-3 Create client-side post and send data to the server side 4.57
